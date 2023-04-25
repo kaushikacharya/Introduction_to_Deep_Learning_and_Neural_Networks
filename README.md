@@ -6,3 +6,4 @@
 
 ## Course Contents
 - [Chapter 0: Learn Deep Learning](./notes/Chapter_0.md)
+- [Chapter 1: Neural Networks](./notes/Chapter_1.md)
