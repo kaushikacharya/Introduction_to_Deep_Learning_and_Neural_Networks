@@ -8,3 +8,4 @@
 - [Chapter 0: Learn Deep Learning](./notes/Chapter_0.md)
 - [Chapter 1: Neural Networks](./notes/Chapter_1.md)
 - [Chapter 2: Training Neural Networks](./notes/Chapter_2.md)
+- [Chapter 3: Convolutional Neural Networks](./notes/Chapter_3.md)

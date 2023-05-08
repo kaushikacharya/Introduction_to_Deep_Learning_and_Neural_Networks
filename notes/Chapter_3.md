@@ -1,6 +1,11 @@
 # Convolutional Neural Networks
 1. [The Principles of the Convolution](#the-principles-of-the-convolution)
 2. [Convolution in Practice](#convolution-in-practice)
+3. [Build a Convolutional Network](#build-a-convolutional-network)
+4. [Batch Normalization and Dropout](#batch-normalization-and-dropout)
+5. [Skip Connections](#skip-connections)
+6. [CNN Architectures](#cnn-architectures)
+7. [Quiz Yourself on CNNs](#quiz-yourself-on-cnns)
 
 ## The Principles of the Convolution
 - ### Why convolution?
@@ -101,10 +106,160 @@
 
 ## Build a Convolutional Network
 - We will build a fully functional CNN and train it with CIFAR dataset.
-- This is an extension of the [previous assignment](./Chapter_2.md#training-in-pytorch).
+- This is an extension of the [previous assignment](./Chapter_2.md#help).
 - [Notebook (Question)](../code/cnn_question.ipynb)
 - [Notebook (Answer)](../code/cnn_answer.ipynb)
     - Good practice:
         - Use ```relu``` function from [```torch.nn.functional```](https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html)
 - Additional info (KA):
     - [Discussion in PyTorch's forum](https://discuss.pytorch.org/t/transition-from-conv2d-to-linear-layer-equations/93850/3) explains the image tensor size at each of the network layers.
+
+## Batch Normalization and Dropout
+- ### Batch normalization
+    - Related idea: Input scaling
+    - Non-normalized input features:
+        - Undesirable to train a model with **gradient descent** using these features.
+
+- ### Notations
+    - Batch features shape: [N, C, H, W]
+        - N: Batch size
+        - C: Feature channels
+        - H: Height
+        - W: Width
+    - Batch normalization (BN) normalizes the mean and standard deviation for each individual feature map/channel.
+        - Explained y mathematical equation as well as visually.
+    - Trainable parameters:
+        - $\lambda$
+        - $\beta$
+    - These trainable parameters result in the linear/affine transformation, which is different for all channels.
+
+- ### Advantages and disadvantages of using batch normalization
+    - **Advantages**:
+        - Accelerates the training of deep neural networks and tackles the vanishing gradient problem.
+        - Beneficial effect on the gradient flow through the network:
+            - Reduces the dependence of gradients on
+                - Scale of the parameters or
+                - Their initial values.
+            - This allows us to use higher learning rates.
+        - In theory, makes it possible to use saturating nonlinearities by preventing the network from getting stuck.
+        - Makes the gradients more predictive.
+    - **Disadvantages**:
+        - May cause inaccurate estimation of batch statistics when we have a small batch size. This increases the model error.
+            - Example: In image segmentation, the batch size is usually too small.
+
+- ### Dropout
+    - Conceptually:
+        - Dropout approximates training a large number of neural networks with different architectures in parallel.
+        - The conceptualization suggests that perhaps dropout breaks-up situations where **network layers co-adapt** to correct mistakes from prior layers, in turn making the model more robust.
+    - In practice, during training, some number of layer outputs are randomly ignored (dropped out) with probability p.
+    - Connectivity alteration:
+        - The same layer will alter its connectivity and will search for **alternate paths** to convey the information in the next layer.
+        - As a result, each update to a layer during training is performed with a **different "view"** of the configured layer.
+    - "Dropping"
+        - **Temporarily removing nodes** from the network for the current forward pass along with its incoming and outgoing connections.
+    - Dropout has the effect of making the training process noisy.
+    - Dropout increases sparsity of the network and in general encourages sparse representations!
+
+## Skip Connections
+- ### The update rule and the vanishing gradient problem
+
+- ### Skip connectione for the win
+    - Skip connections skip some layer in the neural network and feed the output of one layer as the input to the next layers, instead of just the next one.
+    - Two fundamental ways to skip connections through different non-sequential layers:
+        - **Addition**, as in residual architectures.
+        - **Concatenation**, as in densely connected architectures.
+
+- ### ResNet: skip connections via addition
+    - ResNet: Residual Networks
+    - Core idea:
+        - To backpropagate through the identity function by just using vector addition.
+            - F(x) + x
+            - Gradient would then simply be multiplied by one and its value will be maintained in the earlier layers.
+    - ResNets stack these skip residual blocks together.
+    - Identity function is used to **preserve the gradient**.
+    - Another reason for commonly using skip connections:
+        - This is apart from the vanishing gradients.
+        - Information captured in the initial layers, that we would like to allow the later layers to also learn from them.
+            - Tasks such as:
+                - semantic segmentation
+                - optical flow estimation
+    - Learned features in earlier layers correspond to **lower semantic information** that is extracted from the input.
+        - Without the skip connection, that information would have turned too abstract.
+    - Coding exercise:
+        - Implement a skip connection in PyTorch:
+        - My solution:
+            ```
+            class SkipConnection(nn.Module):
+
+                def __init__(self):
+                    super(SkipConnection, self).__init__()
+                    self.conv_layer1 = nn.Conv2d(3, 6, 2, stride=2, padding=2)
+                    self.relu = nn.ReLU(inplace=True)
+                    self.conv_layer2 = nn.Conv2d(6, 3, 2, stride=2, padding=2)
+                    self.relu2 = nn.ReLU(inplace=True)
+
+                def forward(self, input: torch.FloatTensor) -> torch.FloatTensor:
+                    # WRITE YOUR CODE HERE
+                    h1 = self.conv_layer1(input)
+                    self.relu(h1)
+                    h2 = self.conv_layer2(h1)
+                    self.relu(h2)
+                    o = h2 + input
+                    return o
+            ```
+
+- ### DenseNet: skip connections via concatenation
+    - For better understanding, I followed the Aman Arora's blog on [DenseNet and its implementation in TorchVision](https://amaarora.github.io/posts/2020-08-02-densenets.html)
+        - In a DenseNet architecture, each layer is connected to every other layer.
+        - For each layer, the feature maps of all the preceding layers are used as inputs, and its own feature maps are used as input for each subsequent layers.
+            - The input of a layer inside DenseNet is the concatenation of feature maps from previous layers.
+        - **Advantages**:
+            - Alleviate the vanishing gradient problem.
+            - Strenghthen feature propagation.
+            - Encourage feature reuse.
+            - Substantially reduce the number of parameters.
+        - Dividing the network into densely connected blocks:
+            - Inside the dense blocks, the feature map size remains the same.
+                - This makes the feature concatenation possible.
+        - Transition layers:
+            - Layers between the dense blocks.
+            - It performs convolution + pooling.
+
+## CNN Architectures
+- ### AlexNet
+    - Trained on [ImageNet](http://www.image-net.org/)
+        - Dataset with 1M training images of 1000 classes.
+
+- ### VGG
+    - Paper:
+        - Very Deep Convoluitonal Networks for Large-Scale Image Recognition.
+        - The paper showed evidence that simply adding more layers increases performance.
+    - Principles:
+        - A stack of three $3*3$ convoluiton layers are similar/even better to a single $7*7$ layer.
+            - Reason: Usage of three non-linear activations in between (instead of one) makes the function more discriminative.
+        - This design decreases the number of parameters.
+
+- ### InceptionNet/GoogleNet
+    - Paper:
+        - Going Deeper with Convolutions
+    - Motivation:
+        - Increasing the depth (number of layers) is not the only way to make a model bigger.
+        - How about increasing both the depth and width of the network while keeping computations to a constant level?
+        - The inspiration comes from the human visual system, wherein information is processed at multiple scales and then aggregated locally.
+            - Challenge: To achieve without a memory explosion.
+    - Output padding:
+        - Padding *p* and kernel *k* defined so that output spatial dimensions equal input spatial dimensions.
+    - Kernel size preference (in general):
+        - Larger kernel: Preferred for information that resides globally.
+        - Smaller kernel: Preferred for information that is distributed locally.
+    - Uses convolutions of different kernel sizes ($5*5, 3*3, 1*1$) to capture details at multiple scales.
+    - Computation reduction:
+        - $1*1$ convolutions are used to compute reductions before the computationally expensive convolutions ($3*3$ and $5*5$).
+        - $1*1$ convolutions work similar to a low dimensional embedding.
+    - Addition info (KA):
+        - [Visual explanation of kernel dilation](https://www.educative.io/answers/what-is-dilated-convolution)
+    
+## Quiz Yourself on CNNs
+- The axis that we slide the input data defines the dimension of a convolution. For images, it’s a 2D convolution since we “slide” only in the spatial dimensions. But we can still apply convolutions in 1D sequences that have some kind of local structure.
+- Skip-connections may provide more paths, however, they tend to make effective receptive field smaller.
+    - Source: https://theaisummer.com/receptive-field/
