@@ -146,6 +146,16 @@
     - **Disadvantages**:
         - May cause inaccurate estimation of batch statistics when we have a small batch size. This increases the model error.
             - Example: In image segmentation, the batch size is usually too small.
+    - Batch Normalization implementation:
+        - My Solution
+            - [Code](../code/batch_normalization_exercise.py)
+            - Not sure why the output is different from the expected output.
+            - Broadcasting method idea taken from user kmario23's answer in [StackOverflow thread](https://stackoverflow.com/questions/51097719/add-substract-between-matrix-and-vector-in-pytorch).
+
+        - Official solution:
+            - [Code](../code/batch_normalization_official_solution.py)
+            - Why standard deviation is computed manually?
+                - Shouldn't it be easier if ```torch.std``` is used?
 
 - ### Dropout
     - Conceptually:
