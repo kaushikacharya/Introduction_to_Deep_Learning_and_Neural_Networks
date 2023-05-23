@@ -1,0 +1,146 @@
+# Autoencoders
+1. [Generative Learning](#generative-learning)
+2. [Basics of Autoencoders](#basics-of-autoencoders)
+
+## Generative Learning
+- ### Discriminative vs generative models
+    - Discriminative models:
+        - Learn the probability of a label y based on a data point x.
+        - In mathematical terms, denoted by $p(y|x)$.
+        - We need to learn a mapping between the data and the classes.
+    - Generative models:
+        - Learn a probability distribution over the data points without external labels.
+        - Mathematically formulated as $p(x)$.
+    - Conditional generative models:
+        - A category of models that try to learn the probability distribution of the data x conditioned on the labels y.
+        - Denoted by $p(x|y)$.
+    - Bayes' rule:
+        - $p(x|y) = (p(y|x)/p(y))*p(x)$
+            - Aforementioned model types are somewhat interconnected.
+        - This effectively tells us that we can build eacy type of model as a combination of the other types.
+
+- ### Generative models
+    - Probability density function $p(x)$
+        - This probability density effectively describes the behavior of our training data and enables us to generate novel data by smapling from the distribution.
+
+- ### Latent variable models
+    - Latent variable models aim to model the probability distribution with latent variables.
+        - Mathematically, data points $x$ that follow a probability distribution $p(x)$ are mapped into latent variables $z$ tyaht follow a distribution $p(z)$.
+    - Latent variables:
+        - Transformation of the data points into a **continuous lower-dimensional space**.
+    - **Intuitively**, latent variables describe or "explain" the data in a simpler way.
+    - We can now define five basic terms:
+        - **Prior distribution** $p(z)$
+            - Models the behavior of the latent variables.
+        - **Likelihood** $p(x|z)$
+            - Defines how to map latent variables to the data points.
+        - **Joint distribution** $p(x,z) = p(x|z) * p(z)$
+            - Multiplication of the likelihood and the prior.
+            - Essentially describes our model.
+        - **Marginal distribution** $p(x)$
+            - Distribution of the original data.
+            - Ultimate goal of the model.
+        - **Posterior distribution** $p(z|x)$
+            - Describes the latent variables that can be produced by a specific data point.
+    - Let's define two more terms:
+        - **Generation**
+            - Refers to the process of computing the data point $x$ from the latent variable $z$.
+            - In essence, we move from the latent space to the actual data distribution.
+            - Mathematically represented by the likelihood $p(x|z)$.
+        - **Inference**
+            - Refers to the process of finding the latent variable $z$ from the data point x.
+            - Mathematically formulated by the posterior distribution $p(z|x)$.
+    - If we assume that we somehow know:
+        - Likelihood $p(x|z)$
+        - Posterior $p(z|x)$
+        - Marginal $p(x)$
+        - Prior $p(z)$,
+        - we can do the following:
+
+- ### Generation
+    - To generate a data point, 
+        - we can sample $z$ from $p(z)$,
+            - $z \sim p(z)$
+        - and then sample the data point $x$ from $p(x|z)$
+            - $x \sim p(x|z)$
+
+- ### Inference
+    - To infer a latent variable,
+        - we sample $x$ from $p(x)$,
+            - $x \sim p(x)$
+        - and then sample $z$ from $p(z|x)$
+            - $z \sim p(z|x)$
+    
+    - Fundamental question of latent variable models:
+        - How all those distributions can be found?
+            - Answer: Variational Autoencoders (VAE)
+
+## Basics of Autoencoders
+- Autoencoders are simple neural networks such that their output is their input.
+- Goal:
+    - Learn how to reconstruct the input data.
+- Additional info (KA):
+    - [Variational Autoencoders: A Vanilla Implementation](https://mlarchive.com/deep-learning/variational-autoencoders-a-vanilla-implementation/)
+- 1st part:
+    - Encoder
+        - Receives the input and encodes it in a latent space of a lower dimension (the latent variables $z$).
+        - We can think of the latent space as a continuous low-dimensional space.
+            - ?? continuous: Does it refers to dense vector representation?
+- 2nd part:
+    - Decoder
+        - Takes the low-dimensional vector and decodes it in order to produce the original input.
+- Applications of the latent vector $z$ includes:
+    - Compression
+    - Dimensionality reduction
+- We can apply them to entirely novel data. Practical applications include:
+    - Data denoising:
+        - Feed the network with a noisy image and train them to output the same image but without the noise.
+    - Training data augmentation
+    - Anomaly detection:
+        - Train an autoencoder on data from a single category so that every anomaly gives a large reconstruction error.
+- Vanilla autoencoders are trained using a reconstruction loss, which in its simplest form is nothing more than the L2 distance.
+
+- ### Exercise
+    - Description of the model i.e. each of the layers is written as comment in the [code](../code/autoencoder.py).
+    - Few things to notice:
+        - In the first part of the network, the size of the input is gradually decreasing, resulting in a compact latent representation.
+        - In the second part, [ConvTranspose2d](https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html) layers are increasing the size with the goal to output the original size on the final layer.
+            - Additional info (KA):
+                - [Transposed convolution animation](https://github.com/vdumoulin/conv_arithmetic/blob/master/README.md#transposed-convolution-animations)
+        - Each layer is followed by a ```ReLu``` activation.
+        - The final output is passed through a ```Sigmoid```.
+    - Additional info (KA):
+        - Calculate number of CNN parameters:
+            - Explained by the user *hbaderts* in [StackOverflow thread](https://stackoverflow.com/questions/42786717/how-to-calculate-the-number-of-parameters-for-convolutional-neural-network/42787467)
+            - Weights: $n*m*k*l$
+                - $n * m$: filter size
+                - $l$: Number of feature maps as input
+                - $k$: Number of feature maps as output
+            - Bias: $k$
+                - Bias term for each output feature map.
+            - Hence total number of parameters:
+                - $(n*m*l + 1)*k$
+        - Calculation for the exercise:
+            - 1st CNN layer:
+                - Number of parameters = $(F*F*l + 1)*k$
+                    - $(F*F*3 + 1)*12 = 588$
+                        - Kernel size: $F*F$
+                        - Solving above equation gives the kernel size: $F = 4$
+                - Next we need to calculate the parameter values based on the equation defined in [Conv2d](https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html).
+                    - $H_{out} = (H_{in} + 2P - D(F-1) - 1)/S + 1$
+                        - $P$: Padding
+                        - $D$: Dilation
+                        - $S$: Stride
+                    - One possible solution:
+                        - $P = 1$
+                        - $D = 1 (default)$
+                        - $S = 2$
+            - Similarly parameter values for rest of the CNN layers can be computed.
+    - Solution:
+        - [Kaushik](../code/autoencoder_exercise.py)
+            - Learning:
+                - ```ReLU``` layers needs to be explicitly defined as the test cases in the course checks for the network layers.
+                    - Simply executing ```torch.relu``` inside ```forward``` function throws error for the test cases.
+        - [Official Solution](../code/autoencoder_official_solution.py)
+            - Good practice:
+                - Encoder and Decoder layers are grouped together using ```nn.Sequential```.
