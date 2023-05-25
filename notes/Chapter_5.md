@@ -1,6 +1,7 @@
 # Autoencoders
 1. [Generative Learning](#generative-learning)
 2. [Basics of Autoencoders](#basics-of-autoencoders)
+3. [Variational Autoencoder: Theory](#variational-autoencoder-theory)
 
 ## Generative Learning
 - ### Discriminative vs generative models
@@ -81,6 +82,12 @@
     - Learn how to reconstruct the input data.
 - Additional info (KA):
     - [Variational Autoencoders: A Vanilla Implementation](https://mlarchive.com/deep-learning/variational-autoencoders-a-vanilla-implementation/)
+        - Main goal:
+            - To generate high quality output data (e.g. images, texts, or sounds) that belong to the same distribution of the input data.
+        - Three main families of generative models:
+            - Variational autoencoders (VAE)
+            - Generative Adversarial Network (GANs)
+            - Diffusion Models
 - 1st part:
     - Encoder
         - Receives the input and encodes it in a latent space of a lower dimension (the latent variables $z$).
@@ -144,3 +151,76 @@
         - [Official Solution](../code/autoencoder_official_solution.py)
             - Good practice:
                 - Encoder and Decoder layers are grouped together using ```nn.Sequential```.
+
+## Variational Autoencoder: Theory
+- ### Overview
+    - In simple terms, a variational encoder is a probabilistic version of autoencoders.
+    - Each latent variable $z$ that is generated from the input represents a probability distribution (posterior distribution denoted by $p(z|x)$).
+    - Encoder approximates the posterior by computing another distribution $q(z|x)$, known as the **variational posterior**.
+    - A probability distribution is fully characterized by its parameters.
+        - So it is enough to pass the parameters of the probability distribution in the decoder instead of simply passing the latent vector $z$ like the simple autoencoder.
+    - The decoder receives the distribution parameters and tries to reconstruct the input x.
+    - Challenge:
+        - One cannot backpropagate through a sampling operation.
+
+- ### Train a variational autoencoder
+    - True posterior: $p(z|x)$
+    - Variational posterior: $q(z|x)$
+        - The course mentions variational posterior as $p(z|x)$ which in my opinion is incorrect as per the statement mentioned few sentences above.
+    - Goal:
+        - Variational posterior as close as possible to the true posterior.
+    - Evidence Lower Bound (ELBO):
+        - Additional info (KA):
+            - https://mbernste.github.io/posts/elbo/
+                - Explains definition, context and derivation.
+        - Loss = Reconstruction term - KL Divergence
+            - 1st term: Reconstruction term
+                - Controls how well the VAE reconstructs a data point $x$ from a sample $z$ of the variational posterior.
+                - Known as **negative reconstruction error**.
+                - If data points are binary (follow the Bernoulli distribution):
+                    - reconstruction term can be proved to:
+                        - $log\, p_\theta(x_i|z_i) = \sum_{j=1}^n[x_{ij}log\,p_{ij} + (1 - x_{ij})log(1-p_{ij})]$
+            - 2nd term: KL Divergence:
+                - Controls how close the variational posterior is to the prior.
+                - If we assume Gaussian prior distribution:
+                    - -(1/2)$\sum_{j=1}^J(1 + log(\sigma_j^2) -\mu_j^2 - \sigma_j^2)$
+    - Implementation:
+        - In practice, we used closed analytical forms to compute the ELBO.
+        - Reconstruction term:
+            - When the data points are binary (follow the Bernoulli distribution), the equation is simply the binary cross entropy.
+                - Implemented in PyTorch using ```torch.nn.BCELoss(reduction='sum')```
+        - KL-Divergence term:
+            - If we assume that the prior distribution is a Gaussian, then KL-Divergence also has a closed form.
+            - Additional info (KA):
+                - [Derivation of KL Divergence for Gaussian distribution](https://leenashekhar.github.io/2019-01-30-KL-Divergence/)
+        - Solution:
+            - [Kaushik](../code/elbo_exercise.py)
+            - [Official Solution](../code/elbo_official_solution.py)
+
+- ### Reparameterization trick
+    - Intuition:
+        - Because we cannot compute the gradient of an expectation, we want to rewrite the expectation so that the distribution is independent of the parameter $\theta$.
+    - Formulating the abstract idea:
+        - Transform a sample from a **fixed**, known distribution to a sample from $q_{\phi}(z)$.
+        - If we consider the Gaussian distribution, we can express $z$ wrt. a fixed $\epsilon$, where $\epsilon$ follows the normal distribution $N(0,1)$.
+        - So now $\epsilon$ is the stochastic term.
+    - Backpropagation:
+        - Since backpropagation cannot be performed in a fully stochastic operation, hence we will not backpropagate through $\epsilon$.
+        - So, instead:
+            - A fixed part stochastic with $\epsilon$ is kept.
+            - The mean and the standard deviation are trained.
+        - Next, backpropagate through the mean $\mu$ and the standard deviation $\sigma$ that are outputs of the encoder.
+        - Define the latent space vector $z$ as
+            - $z = \mu + \sigma\epsilon$ with $\epsilon$ ~ $N(0,1)$
+        - $\epsilon$ term introduces the stochastic part and is **not** involved in the training process.
+        - Therefore, we can now compute the gradient and run backpropagation of ELBO w.r.t. variational parameters $\theta$.
+    - Exercise:
+        - Implementation of reparameterization trick in Pytorch
+        - Solution:
+            - [Kaushik](../code/reparameterization_trick_exercise.py)
+            - [Official Solution](../code/reparameterization_trick_official_soluiton.py)
+                - IMHO, sampling equation is incorrect.
+                    - $sample = mu + (eps * var)$
+                        - Instead of $var$ we should use $std$.
+                - Refer [mlarchive's implementation](https://mlarchive.com/deep-learning/variational-autoencoders-a-vanilla-implementation/)
+                    - Have a look at the section **Reparameterization Trick**
