@@ -14,4 +14,4 @@
 
 ## Related Repositories
 - [Deep Learning PyTorch Fundamentals](../Deep_Learning_Pytorch_Fundamentals_Educative/)
-    - Explains the basics of PyTorch model training using a simple regression and a classification problem.
+    - Explains the basics of PyTorch model training using a simple regression and a classification problem. The steps involved in the training process are better explained in this course.
