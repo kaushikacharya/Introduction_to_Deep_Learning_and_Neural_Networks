@@ -110,7 +110,7 @@
 - Vanilla autoencoders are trained using a reconstruction loss, which in its simplest form is nothing more than the L2 distance.
 
 - ### Exercise
-    - Description of the model i.e. each of the layers is written as comment in the [code](../code/autoencoder.py).
+    - Description of the model i.e. each of the layers is written as comment in the [code](../code/autoencoder_exercise.py).
     - Few things to notice:
         - In the first part of the network, the size of the input is gradually decreasing, resulting in a compact latent representation.
         - In the second part, [ConvTranspose2d](https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html) layers are increasing the size with the goal to output the original size on the final layer.
@@ -288,3 +288,7 @@
                     - Isn't [GaussianNLLLoss](https://pytorch.org/docs/stable/generated/torch.nn.GaussianNLLLoss.html#torch.nn.GaussianNLLLoss) a more suitable loss function than [MSELoss](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html)?
                     - What should be the analytical form of the *expectation*?
                         - The Educative course mentions that for binary data points the analytical form can be represented by [BCELoss](https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html).
+    - Solution:
+        - [Kaushik](../code/vae.ipynb)
+            - Observation:
+                - Reconstructed images are quite blurred.
