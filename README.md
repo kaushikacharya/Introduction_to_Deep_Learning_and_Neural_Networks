@@ -18,6 +18,7 @@ This repository contains
 - [Chapter 4: Recurrent Neural Networks](./notes/Chapter_4.md)
 - [Chapter 5: Autoencoders](./notes/Chapter_5.md)
 - [Chapter 6: Generative Adversarial Networks](./notes/Chapter_6.md)
+- [Chapter 7: Attention and Transformers](./notes/Chapter_7.md)
 
 ## Related Repositories
 - [Deep Learning PyTorch Fundamentals](../Deep_Learning_Pytorch_Fundamentals_Educative/)
