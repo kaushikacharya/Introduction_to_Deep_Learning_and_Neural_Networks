@@ -8,6 +8,7 @@
 6. [Transformers Building Blocks](#transformers-building-blocks)
 7. [The Transformer's Encoder](#the-transformers-encoder)
 8. [The Transformer's Decoder](#the-transformers-decoder)
+9. Quiz Yourself on Transformers
 
 ## Sequence to Sequence Models
 
@@ -71,6 +72,7 @@
 
 - Additional info (KA):
   - [Jay Alammar's blog](https://jalammar.github.io/illustrated-transformer/) on transformers
+  - [Harvard SEAS NLP group](http://nlp.seas.harvard.edu/annotated-transformer/) explains the transformer paper with code annotation.
 
 - ### Overview
 
@@ -125,6 +127,12 @@
 - Errata:
   - The lesson mentions $\sqrt{d_k}$ as the number of words in the sentence.
   - IMHO, Jay Alammar's blog mentions $d_k$ as the dimension of the key vectors. (In the transformer paper, $d_k = 64$).
+- Implementation:
+  - ```ScaledDotProductAttention``` module
+    - ```Optional``` explained in [StackOverflow thread](https://stackoverflow.com/questions/67448206/whats-the-meaning-of-optionaltensor-in-transformer)
+    - Masking in encoder implementation is explained in [StackOverflow thread](https://stats.stackexchange.com/questions/422890/why-do-we-use-masking-for-padding-in-the-transformers-encoder).
+      - Sergey Skrebnev explains with example that mask is applied before softmax to avoid contribution from the padding part of sequences.
+        - Padding is applied to sequences which are too short of the threshold length.
 
 ## Multi-Head Self-Attention
 
@@ -139,6 +147,17 @@
   - Apply attention to all the projected vectors.
   - Concatenate them and apply a final linear.
 - Next come normalization and short skip connections, similar to processing a tensor after convolution or recurrence.
+- Implementation:
+  - ```MultiHeadAttention``` module
+  - Usage of ```nn.ModuleList``` vs ```nn.Sequential``` explained in [PyTorch discuss](https://discuss.pytorch.org/t/when-should-i-use-nn-modulelist-and-when-should-i-use-nn-sequential/5463).
+  - Importance of ```.contiguous()``` in PyTorch explained in [the article](https://saturncloud.io/blog/what-does-contiguous-do-in-pytorch/):
+    - Many PyTorch functions and operations require contiguous tensor as input.
+      - e.g. ```view()``` method
+    - Certain operations may be slower on non-contiguous tensors due to the need for multiple memory reads.
+      - e.g. matrix multiplication
+    - Few operations on tensors in PyTorch do not change the contents of a tensor, but change the way the data is organized.
+      - e.g. ```narrow()```, ```view()```, ```expand()```, ```transpose()```
+      - [StackOverflow thread](https://stackoverflow.com/questions/48915810/what-does-contiguous-do-in-pytorch) explains with example how ```transpose()``` produces non-contiguous tensor as the memory layout is different to that of a tensor of same shape made from scratch.
 - **TODO**
   - How does training ensures that the eight matrices set learn different representation subspaces?
 
@@ -201,6 +220,7 @@
   - The output probabilities are calculated with the standard softmax function.
     - These probabilities predict the next token in the output sequence.
   - [Figure 1 in Amirhossein Kazemnejad's blog](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) shows the transformer architecture.
+  - [Samuel Kierszbaum](https://medium.com/analytics-vidhya/masking-in-transformers-self-attention-mechanism-bad3c9ec235c) explains the need for masking in decoder.
 
 - ### Masked multi-head attention
 
@@ -226,3 +246,57 @@
   - On the other hand, the output of the masked multi-head attention block contains the so far generated new sentence and is represented as the query matrix in the attention layer.
   - The enocder-decoder (cross) attention is trained to associate associate the input sentence with the corresponding output word.
   - The output of the last block of the encoder is used in each decoder block.
+
+## Build a Transformer Encoder
+
+- ### Linear layers
+  
+  - A good first step is to build the linear subcomponent.
+  - A 2-layered feedforward network followed by dropout is good enough.
+  - The forward pass should look like:  
+    1. Linear Layer
+    2. RELU as an activation function
+    3. Dropout
+    4. 2nd Linear Layer
+  - Implementation:
+    - ```FeedForward``` module
+
+- ### Layer normalization
+
+  - A layer normalization module is defined as:
+    - $LN(x) = \alpha ((x - \mu (x))/\sigma (x)) + \beta$
+      - where $\mu$ = mean
+      - $\sigma$ = standard deviation of the input vector
+  - Implementation:
+    - ```LayerNorm``` module
+
+- ### Skip connection
+  
+  - Implementation:
+    - ```SkipConnection``` module
+    - ?? For code simplicity the norm is first as opposed to last.
+
+- ### Multihead attention
+
+  - Implementation
+    - ```MultiHeadAttention``` module
+
+- ### Encoder
+
+  - It's finally time to combine all the previous classes and form the Transformer's encoder.
+
+  - **EncoderLayer**
+    - It consists of the self-attention module and a feed-forward network.
+    - In both of these, a skip connection is applied.
+
+  - **Encoder**
+    - The ```Encoder``` module is a stack of N encoder layers followed by layer normalization.
+    - Tip: To stack a list of modules, a neat trick is to use ```nn.ModuleList``` such as
+
+      ```python
+      nn.ModuleList([copy.deepcopy(layer) for _ in range(N)])
+      ```
+
+  - **TransformerEncoder**
+    - The ```TransformerEncoder``` glues everything together.
+    - Here, we define the ```MultiHeadAttention```, ```FeedForward```, ```EncoderLayer``` and ```Encoder``` modules and build the complete forward pass.
