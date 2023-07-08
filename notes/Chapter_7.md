@@ -8,7 +8,8 @@
 6. [Transformers Building Blocks](#transformers-building-blocks)
 7. [The Transformer's Encoder](#the-transformers-encoder)
 8. [The Transformer's Decoder](#the-transformers-decoder)
-9. Quiz Yourself on Transformers
+9. [Build a Transformer Encoder](#build-a-transformer-encoder)
+10. Quiz Yourself on Transformers
 
 ## Sequence to Sequence Models
 
