@@ -300,3 +300,7 @@
   - **TransformerEncoder**
     - The ```TransformerEncoder``` glues everything together.
     - Here, we define the ```MultiHeadAttention```, ```FeedForward```, ```EncoderLayer``` and ```Encoder``` modules and build the complete forward pass.
+
+- ### Implementation
+
+  - [A simple transformer encoder](../code/transformer_encoder.py)
