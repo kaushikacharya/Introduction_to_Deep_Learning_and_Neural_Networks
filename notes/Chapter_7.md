@@ -280,6 +280,10 @@
 
   - Implementation
     - ```MultiHeadAttention``` module
+    - ?? Why are we reshaping Q, K, V matrices in a two step process (```view``` followed by ```transpose```) instead of doing in one step?
+    - My understanding:
+      - The first three weight matrices (```linears```) are for Q, K and V.
+      - The fourth one is for multiplication with the concatenated attention heads.
 
 - ### Encoder
 
