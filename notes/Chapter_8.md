@@ -3,6 +3,8 @@
 1. [Basics of Graphs](#basics-of-graphs)
 2. [Mathematics for Graphs](#mathematics-for-graphs)
 3. [Graph Convolutional Networks](#graph-convolutional-networks)
+4. [Implementation of a GCN](#implementation-of-a-gcn)
+5. Quiz Yourself on GNNs
 
 ## Basics of Graphs
 
@@ -43,15 +45,22 @@
   - Defined as:
     - $L = D - A$
   - Normalized version is used in graph neural networks.
-    - To avoid problems when processing with greapdient-based methods.
+    - To avoid problems when processing with gradient-based methods.
   - $L_{norm} = D^{-1/2} L D^{-1/2}$
     - $L_{norm} = I - D^{-1/2} A D^{-1/2}$
   - A slightly alternated version often used in graph neural networks:
     - $L_{norm} = D^{-1/2} (A + I) D^{-1/2}$
     - From now on, this will be referred as normalized graph laplacian.
+    - Additional info (KA):
+      - Self-loops are created by adding identity matrix to the adjacency matrix.
+        - This ensures that for each node, we sum up all the feature vectors of all neighboring nodes we include that node too.
+      - $D^{-1}A$: Corresponds to taking the average of neighboring node features.
+      - $D^{-1/2}AD^{-1/2}$: Symmetric normalization
   - With this trick, the input can be fed into a gradient-based algorithm without causing instabilities.
   - Implementation:
     - [Graph Laplacian](../code/graph_laplacian.py)
+  - Additional resource:
+    - [Thomas Kipf's blog](https://tkipf.github.io/graph-convolutional-networks/)
 
 - ### Laplacian eigenvalues and eigenvectors
 
@@ -194,3 +203,38 @@
         - Complex numbers can not be made into an **ordered field** with the usual addition and multiplication as mentioned in the [StackExchange thread](https://math.stackexchange.com/questions/1032257/ordering-of-the-complex-numbers).
         - Incompatibility of min and max for complex numbers between PyTorch and NumPy discussed in [PyTorch's discussion thread](https://github.com/pytorch/pytorch/issues/36374).
       - [StackExchange thread](https://math.stackexchange.com/questions/67304/do-real-matrices-always-have-real-eigenvalues) discusses that real matrices need not have real eigenvalues.
+
+## Implementation of a GCN
+
+- ### Implementing a 1-hop GCN layer in PyTorch
+
+  - For this tutorial, a simple 1-hop GCN layer will be trained on a small graph dataset [MUTAG](https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets).
+    - The above url contains collected benchmark data sets for the evaluation of graph kernels.
+
+  - **MUTAG dataset characteristics**
+
+    - Each node contains a lebel from 0 to 6.
+      - This will be used as a one-hot encoding feature vector.
+    - Number of nodes: 188
+    - Number of classes: 2
+
+  - Our GCN layer will be defined by the following equations:
+    - $Y = L_{norm}XW$
+    - $L_{norm} = D^{-1/2}(A + I)D^{-1/2}$
+  - The usage of adjacency matrix used in graph convolution layers gives graph neural networks a strong bias to respect the initial graph structure in all their layers.
+
+- ### Practical issues when dealing with graphs
+
+  - Batching graph data
+    - Reason: Varying number of nodes
+  - For graph classification, how to produce a single label when we have the node embeddings.
+    - Readout layer
+
+- ### Assignment
+
+  - [Notebook](../code/gnn.ipynb)
+    - torchnet
+      - An open-source framework that provides abstractions and boilerplate logic for machine learning.
+      - [pypi](https://pypi.org/project/torchnet/)
+      - [PyTorch documentation](https://tnt.readthedocs.io/en/latest/index.html)
+      - [Paper](https://lvdmaaten.github.io/publications/papers/Torchnet_2016.pdf) published in 2016.
