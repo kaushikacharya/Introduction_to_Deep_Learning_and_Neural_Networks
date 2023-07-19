@@ -1,4 +1,5 @@
 # Neural Networks
+
 1. [Linear Classifiers](#linear-classifiers)
 2. [Optimization and Gradient Descent](#optimization-and-gradient-descent)
 3. [Neural Networks](#neural-networks)
@@ -7,103 +8,142 @@
 6. Quiz Yourself on Neural Networks
 
 ## Linear Classifiers
-- ### Goal:
-    - Explore linear classifiers, their principles, and their training process.
+
+- ### Goal
+
+  - Explore linear classifiers, their principles, and their training process.
+
 - ### What is a linear classifier?
-    - Additional info (KA):
-        - [nn.Linear](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)
-            - Applies a linear transformation to the incoming data
-                - $y = A^Tx + b$
-        - [Visualization](https://www.sharetechnote.com/html/Python_PyTorch_nn_Linear_01.html)
-            - ```torch.nn.Linear(n,m)```
-                - This module creates single feed forward network with n inputs and m outputs.
+
+  - Additional info (KA):
+    - [nn.Linear](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)
+      - Applies a linear transformation to the incoming data
+        - $y = A^Tx + b$
+    - [Visualization](https://www.sharetechnote.com/html/Python_PyTorch_nn_Linear_01.html)
+      - ```torch.nn.Linear(n,m)```
+        - This module creates single feed forward network with n inputs and m outputs.
 
 - ### Training a classifier
 
 - ### Loss function
-    - We will use the mean squared error distance.
+
+  - We will use the mean squared error distance.
 
 - ### Optimization and training process
 
 ## Optimization and Gradient Descent
+
 - ### Overview
-    - Loss function:
-        - In 2D example, it can be thought of as a parabolic-shaped function that reaches its minimum on a certain pair of $w_1$ and $w_2$.
-        - Actual shape of the loss unknown.
-        - But we can calculate the slope in a point and then move towards the downhill direction.
+
+  - Loss function:
+    - In 2D example, it can be thought of as a parabolic-shaped function that reaches its minimum on a certain pair of $w_1$ and $w_2$.
+    - Actual shape of the loss unknown.
+    - But we can calculate the slope in a point and then move towards the downhill direction.
 
 - ### Slope: the derivative of the loss function
+
+  - Denoted as $\frac{\partial w}{\partial x}$
+
 - ### Computing the gradient of a loss function
+
+  - Once we have the gradients, we adjust the weigths to go downhill.
+  - $w^j = w^{j-1} - \lambda * \frac{\partial C}{\partial w^j}$
+    - Index j: iteration step
+    - $\lambda$: learning rate
+    - IMHO, the partial derivative should be wrt $w^{j-1}$
+
 - ### Summing up the training scheme
 
+  - Implementation:
+    - [Train a linear classifier with Pytorch](../code/train_linear_classifier.py)
+    - Additional info (KA):
+      - User felixmd's answer in [StackOverflow thread](https://stackoverflow.com/questions/51911749/what-is-the-difference-between-torch-tensor-and-torch-tensor) describes the reason for error while using ```torch.tensor()``` for the labels.
+        - ```torch.tensor()``` inferred data type as ```int```.
+
 ## Neural Networks
+
 - ### What is a neuron?
-    - Non-linear functions between linear layers enables modeling complex representations with less linear layers.
-        - Non-linearities makes neural networks rich function approximators.
+
+  - Non-linear functions between linear layers enables modeling complex representations with less linear layers.
+    - Non-linearities makes neural networks rich function approximators.
 
 - ### Multilayer perceptron
 
 - ### Universal approximation theorem
-    - According to universal approximation theorem, given enough neurons and the correct set of weights, a multi-layer neural network can approximate any function.
-    - Neural networks are also very good feature extractors.
+
+  - According to universal approximation theorem, given enough neurons and the correct set of weights, a multi-layer neural network can approximate any function.
+  - Neural networks are also very good feature extractors.
 
 - ### Deep neural networks as feature extractors
-    - Feature extraction:
-        - Transformation of the input data points from the input space to the feature space where classification is much easier.
-    - In most real-life applications:
-        - Only the last one or two layers of a neural network performs the actual classification.
-        - The rest account for feature extraction and learning representation.
+
+  - Feature extraction:
+    - Transformation of the input data points from the input space to the feature space where classification is much easier.
+  - In most real-life applications:
+    - Only the last one or two layers of a neural network performs the actual classification.
+    - The rest account for feature extraction and learning representation.
 
 ## Backpropagation Algorithm
-- ### Overview:
-    - Neural networks:
-        - Non-linear classifiers that can be formulated as a series of matrix multiplications.
-        - Difficulty arises in computing the gradients.
+
+- ### Overview of Backpropagation Algorithm
+
+  - Neural networks:
+    - Non-linear classifiers that can be formulated as a series of matrix multiplications.
+    - Difficulty arises in computing the gradients.
 
 - ### Notations
+
 - ### Forward pass
+
 - ### Backward pass
-    - The error is propagated backwards.
+
+  - The error is propagated backwards.
 
 - ### The chain rule for the backward pass
 
 ## Build a Neural Network with PyTorch
+
 - ### PyTorch basics
-    - [PyTorch](https://pytorch.org/)
-        - An open-source Python deep learning framework.
-        - Enables us to build and train neural networks.
-    - **Tensor**
-        - Fundamental building block of PyTorch.
-        - N-dimensional array.
+
+  - [PyTorch](https://pytorch.org/)
+    - An open-source Python deep learning framework.
+    - Enables us to build and train neural networks.
+  - **Tensor**
+    - Fundamental building block of PyTorch.
+    - N-dimensional array.
 
 - ### Build a neural network
-    - An example of developing a neural network using a sequential order of individual layers:
-        ```
-        nn.Sequential( 
-            nn.Linear(2, 3), 
-            nn.Sigmoid(), 
-            nn.Linear(3, 2), 
-            nn.Sigmoid() 
-        )
-        ```
+
+  - An example of developing a neural network using a sequential order of individual layers:
+
+    ```python
+    nn.Sequential( 
+        nn.Linear(2, 3), 
+        nn.Sigmoid(), 
+        nn.Linear(3, 2), 
+        nn.Sigmoid() 
+    )
+      ```
 
 - ### Program your own neural network
-    - Alternative way to define the above neural network:
-        ```
-        class Model(nn.Module): 
-        def __init__(self): 
-            super(Model, self).__init__() 
-            self.linear1 = nn.Linear(2, 3) 
-            self.linear2 = nn.Linear(3, 2) 
-    
-        def forward(self, x): 
-            h = torch.sigmoid(self.linear1(x)) 
-            o = torch.sigmoid(self.linear2(h)) 
-            return o 
-        ```
 
-    - To run forward propagation:
-        ```
-        model = Model()
-        y = model(x)
-        ```
+  - Alternative way to define the above neural network:
+
+      ```python
+      class Model(nn.Module): 
+      def __init__(self): 
+          super(Model, self).__init__() 
+          self.linear1 = nn.Linear(2, 3) 
+          self.linear2 = nn.Linear(3, 2) 
+  
+      def forward(self, x): 
+          h = torch.sigmoid(self.linear1(x)) 
+          o = torch.sigmoid(self.linear2(h)) 
+          return o 
+      ```
+
+  - To run forward propagation:
+
+      ```python
+      model = Model()
+      y = model(x)
+      ```
