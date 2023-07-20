@@ -231,3 +231,5 @@
 
   - Additional info (KA):
     - Hint available at PyTorch's [optimization documentation page](https://pytorch.org/docs/stable/optim.html#taking-an-optimization-step).
+    - [AttributeError: '_MultiProcessingDataLoaderIter' object has no attribute 'next'](https://stackoverflow.com/questions/74289077/attributeerror-multiprocessingdataloaderiter-object-has-no-attribute-next)
+      - Changed ```dataiter.next()``` to ```next(dataiter)```.
