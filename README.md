@@ -4,8 +4,8 @@
 
 This repository contains
 
-- Course notes
-- Assignments
+- [Course notes](#course-contents)
+- [Assignments](#assignments)
 - Additional resources (collected for better understanding of the concepts)
 
 ## Course Information
@@ -25,6 +25,22 @@ This repository contains
 - [Chapter 7: Attention and Transformers](./notes/Chapter_7.md)
 - [Chapter 8: Graph Neural Networks](./notes/Chapter_8.md)
 - [Conclusion](./notes/Chapter_9.md)
+
+## Assignments
+
+  |Chapter|         Assignment        |   Description   |
+  |-------|---------------------------|-----------------|
+  |#1|[Train linear classifier](./notes/Chapter_1.md#summing-up-the-training-scheme)|Train a linear classifier with dummy input values.|
+  |#2|[Train a Neural Network](./notes/Chapter_2.md#help)|Train a neural network to classify CIFAR10 images into one of the 10 classes.|
+  |#3|[Build and Train CNN](./notes/Chapter_3.md#build-a-convolutional-network)|Build and train CNN on CIFAR dataset. This assignment is a follow-up of previous assignment (Chapter #2). Here feedforward network is replaced by CNN.|
+  |#3|[Batch Normalization](./notes/Chapter_3.md#batch-normalization-implementation)|Batch normalization function|
+  |#3|[Skip Connection](./notes/Chapter_3.md#resnet-skip-connections-via-addition)|ResNet skip connection class|
+  |#4|[LSTM cell](./notes/Chapter_4.md#simplication-of-lstm-equations)|Develop an LSTM cell from scratch.|
+  |#4|RNN|RNN|
+  |#5|[Autoencoder](./notes/Chapter_5.md#exercise)|Filter size computed from the equation for number of parameters.|
+  |#5|[ELBO](./notes/Chapter_5.md#elbo-implementation)|Evidence lower bound (ELBO)|
+  |#5|[Reparameterization trick](./notes/Chapter_5.md#reparameterization-trick-exercise)|Reparameterization trick|
+  *****
 
 ## Related Repositories
 
