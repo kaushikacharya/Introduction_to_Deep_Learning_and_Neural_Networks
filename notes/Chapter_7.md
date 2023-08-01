@@ -15,12 +15,14 @@
 
 - ### Formulating text in terms of machine learning
 
+  - Input and output sentences are represented as sequences.
+
 - ### Seq2Seq
 
   - Sequence to sequence models
     - Input sequence: $x = (x_1, x_2,...x_n)$ (Sequence of tokens)
-    - x -> Encoder -> z (Intermediate representation)
-    - z -> Decoder -> $y = (y_1, y_2,....,y_m)$ (Predicted sequence)
+    - $x =>$ Encoder $=> z$ (Intermediate representation)
+    - $z =>$ Decoder $=> y = (y_1, y_2,....,y_m)$ (Predicted sequence)
 
 - ### A comprehensive view of encoder and decoder
 
@@ -28,18 +30,20 @@
     - The **encoder** and **decoder** are stacked RNN/LSTM cells, such as LSTMs.
   - The encoder processed the input and produces one **compact representation**, called $z$, from all the input timesteps.
     - $z$ can be regarded as a compressed format of the input.
-  - on the other hand, the decodr receives the context vecotr $z$ and generates the output sequence.
+  - On the other hand, the decoder receives the context vector $z$ and generates the output sequence.
 
 - ### The limitations of RNNs
 
   - Bottleneck problem:
-    - Intermediate repesentation $z$ cannot encode informaiton from all the input timesteps.
+    - Intermediate repesentation $z$ cannot encode information from all the input timesteps.
+    - [Lena Voita's blog on Seq2seq and Attention](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#attention_intro)
+      - Explains the bottleneck problem visually.
   - Vanishing gradient problem:
     - The stacked RNN layers create this well-known problem.
 
 ## Attention
 
-- ### Overview
+- ### Overview of attention
 
   - Core idea:
     - The context vector $z$ should have access to **all** parts of the input sequence instead of just the last one.
@@ -106,23 +110,25 @@
     - Sense of order is embedded by slightly altering the embeddings based on the position.
     - Officially, positional encoding is a set of small constants that are added to the word embedding vector before the first self-attention layer.
     - In the transformer paper, the authors came up with the sinusoidal function for the positional encoding.
-      - [Figure 2 in Amirhossein Kazemnejad's blog](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) shows positional encodings as wave lengths.
-    
-    - ### Feature-based attention: the key, value, and query
+      - [Amirhossein Kazemnejad's blog](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
+        - **The intuition** section explains how the sinusoidal functions are float continuous counterparts of the rate of the change in bits of the binary format of the natural numbers.
+        - Figure 2 shows positional encodings as wave lengths.
 
-      - Key-value-query concepts come from information retrieval systems.
-      - Foundation of concept/feature-based lookup:
-        - When a particular video is searched (**query**), the search engine maps **query** against a set of **keys** (video, title, description etc.) associated with possible stored videos. Then the algorithm presents the best-matched videos (**values**).
-      - Additional info (KA):
-        - This concept is explained in Jay Alammar's blog.
-          - Under the section **Self-Attention in Detail**, self attention computations are explained in terms of vectors.
+  - ### Feature-based attention: the key, value, and query
 
-    - ### Vector similarity in high dimensional spaces
+    - Key-value-query concepts come from information retrieval systems.
+    - Foundation of concept/feature-based lookup:
+      - When a particular video is searched (**query**), the search engine maps **query** against a set of **keys** (video, title, description etc.) associated with possible stored videos. Then the algorithm presents the best-matched videos (**values**).
+    - Additional info (KA):
+      - This concept is explained in Jay Alammar's blog.
+        - Under the section **Self-Attention in Detail**, self attention computations are explained in terms of vectors.
+
+  - ### Vector similarity in high dimensional spaces
 
 ## Self-Attention
 
 - Enables us to find correlations between different words (tokens) of the input indicating the **syntactic** and **contextual structure** of the sentence.
-- $Attention(Q,K,V) = softmax((QK^T)/\sqrt{d_k})V$
+- $Attention(Q,K,V) = softmax(\frac{QK^T}{\sqrt{d_k}})V$
   - Scaling factor $\sqrt{d_k}$
     - Makes sure that the vectors won't explode.
 - Errata:
@@ -142,6 +148,7 @@
 - Practical meaning:
   - The model can better capture **positional information** because each head will attend to different segments of the input. Their combination will give us a more robust representation.
   - Each head will capture different contextual information by correlating words in a unique manner.
+- Since **heads are independent of each other**, we can perform the self-attention computation in parallel on different workers.
 - Multi-head attention enables the model to **jointly** attend to information from different input representations (projected in a linear subspace) at different positions.
 - Three basic steps:
   - Compute the linear projections into keys, queries, and values.
@@ -167,7 +174,7 @@
 - ### Short residual skip connections
 
   - In language, there is a significant notion of a wider understanding of the world and our ability to combine ideas.
-  - Humans extensibly utilixe these top-down influences (our expectations) to combine words in different contexts.
+  - Humans extensibly utilizse these top-down influences (our expectations) to combine words in different contexts.
   - In a very rough manner, skip connections give a transformer a tiny ability to allow the representations of different levels of processing to interact.
 
 - ### Layer normalization
@@ -176,7 +183,9 @@
   - Additional info (KA):
     - [Bala Priya's blog](https://www.pinecone.io/learn/batch-layer-normalization/#what-is-layer-normalization)
       - Normalization across features, independently for each sample.
-      - Explained with visualization.
+      - Explains visually the difference between batch normalization and layer normalization.
+      - As layer normalization removes the dependence on batches, it makes it well suited for sequence models.
+      - Whereas batch normalization is less suited for sequence models.
 
 ## The Transformer's Encoder
 
@@ -197,12 +206,13 @@
     - A normalization layer.
     - A residual connection around the previous two sublayers.
     - A linear layer.
+      - IMHO, better to refer it as feed-forward layer.
     - A second normalization layer.
     - A second residual connection.
 
 ## The Transformer's Decoder
 
-- ### Overview
+- ### Overview of Transformer's Decoder
 
   - The decoder consists of all the aforementioned components plus two novel ones. As before:
     - The output sequence is fed in its entirety, and word embeddings are computed.
@@ -218,8 +228,9 @@
 
   - The decoder block repeats N=6 times.
   - The final output is transformed through a final linear layer.
-  - The output probabilities are calculated with the standard softmax function.
-    - These probabilities predict the next token in the output sequence.
+  - Output probabilities:
+    - Calculated with the standard softmax function.
+    - Predict the next token in the output sequence.
   - [Figure 1 in Amirhossein Kazemnejad's blog](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) shows the transformer architecture.
   - [Samuel Kierszbaum](https://medium.com/analytics-vidhya/masking-in-transformers-self-attention-mechanism-bad3c9ec235c) explains the need for masking in decoder.
 
@@ -227,6 +238,8 @@
 
   - We don't know the whole sentence because it hasn't been produced yet.
   - We mask the next word embeddings by setting them to $-\inf$.
+  - MaskedAttention(Q,K,V) = $softmax(\frac{QK^T+M}{\sqrt{d_k}}) V$
+    - where matrix M (mask) consists of zeros and $-\inf$.
 
 - ### Teacher forcing
 
@@ -245,7 +258,7 @@
     - The encoder's output encapsulates the final embedding of the input sentence.
     - We will use the encoder output to produce the key and value matrices.
   - On the other hand, the output of the masked multi-head attention block contains the so far generated new sentence and is represented as the query matrix in the attention layer.
-  - The enocder-decoder (cross) attention is trained to associate associate the input sentence with the corresponding output word.
+  - The enocder-decoder (cross) attention is trained to associate the input sentence with the corresponding output word.
   - The output of the last block of the encoder is used in each decoder block.
 
 ## Build a Transformer Encoder
@@ -265,7 +278,7 @@
 - ### Layer normalization
 
   - A layer normalization module is defined as:
-    - $LN(x) = \alpha ((x - \mu (x))/\sigma (x)) + \beta$
+    - $LN(x) = \alpha (\frac{x - \mu (x)}{\sigma (x)}) + \beta$
       - where $\mu$ = mean
       - $\sigma$ = standard deviation of the input vector
   - Implementation:
