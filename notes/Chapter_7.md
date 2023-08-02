@@ -67,6 +67,10 @@
   - Attention $(y_i,h)$:
     - Score between the previous state of the decoder $y_{i-1}$ and the hidden state $h = [h_1,h_2,...,h_n]$
   - Attention score describes the relationship between the two states and captures how "aligned" they are.
+  - Implementation:
+    - [attention](../code/attention.py)
+      - Though the solution works in the Educative platform, but I am not sure how to make it execute it correctly in local machine.
+      - For each test case, the forward is executed twice in the calling function (hidden) in the Educative platform.
 
 - ### Self-attention: the key component of the transformer architecture
 
