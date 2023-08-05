@@ -26,9 +26,18 @@
 
 - ### Real-world signals that we can model with graphs
 
+  - Graph as a composition of structure and signal:
+    - Structure = Adjacency Matrix
+      - $A \in R^{N \cdot N}$
+    - Graph Signal (feature matrix)
+      - $X \in R^{N \cdot F}$
+      - $F$: Number of features
+        - RGB image: $F$ = 3
+        - Word: $F$ = embedding dimension
+
 ## Mathematics for Graphs
 
-- ### The basic maths for processing graph-strucuted data
+- ### The basic maths for processing graph-structured data
 
   - Graph signal $X \in R^{N * F}$
   - Adjacency matrix $A \in R^{N * N}$
@@ -65,6 +74,7 @@
 - ### Laplacian eigenvalues and eigenvectors
 
   - The multiplicity of the zero eigenvalue of the graph laplacian is equal to the number of connected components.
+    - Multiplicity k: k distinct non-trivial eigen vectors.
   - Additional info (KA):
     - [Petersen graph](https://en.wikipedia.org/wiki/Petersen_graph)
       - A small graph that serves as a useful example and counterexample for many problems in graph theory.
@@ -109,7 +119,7 @@
       - **Inductive learning**
       - Example: Protein type
     - **Node classification**
-      - Find a label for the nodes of a graph (usally a huge graph).
+      - Find a label for the nodes of a graph (usually a huge graph).
       - Formulated as a *semi-supervised* learning task.
         - **Transductive learning**
         - We have very few labeled nodes to train the model.
@@ -125,6 +135,7 @@
       - A: Usually binary and has no interpretation
   - By definition, multiplying a graph operator by a graph signal will compute a weighted sum of each node's neighborhood.
     - This can be expressed with a simple matrix multiplication.
+    - In general, when a graph operator is multiplied by graph signal, transformed graph signal is created.
   - $L_{norm}$: Normalized Laplacian
     - A more expressive operator than $A$.
     - Direct interpretation
@@ -181,7 +192,6 @@
         - Takes multiple kernel filter sizes within the CNN, and rather than stacking them sequentially, orders them to operate on the same level.
 
   - **What we actually do under the hood: spectral filtering on the eignevalues**
-
     - Even though an implementation of the pre-described method is provided, we actually raise the eigenvalues to the power K.
     - The power of the Laplacian is applied in the eigenvalues:
       - $L^p = (U \Lambda U^T)^p = U \Lambda^p U^T$
@@ -193,7 +203,8 @@
     - **Insight**:
       - By approximating a higher power K of the Laplacian, we actually design spectral filters that enable each layer to aggregate information from K-hops away neighbors in the graph, similar to increasing the kernel size of a convolutional kernel.
 
-  - **Illustration of the general graph convolution method**
+  - #### Illustration of the general graph convolution method
+
     - [Implementation](../code/chebyshev_approximation_laplacian_powers.py)
       - ?? Why is ```create_graph_laplacian_norm()``` different from $L_{norm}$ defined in this chapter?
       - ```@``` matrix multiplication operator explained in [Ali Sivji's article](https://alysivji.github.io/python-matrix-multiplication-operator.html).
