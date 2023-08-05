@@ -230,6 +230,8 @@
   - Coding exercise:
     - Implement a skip connection in PyTorch:
     - [My solution](../code/skip_connection.py)
+  - Exercise for Final Quiz:
+    - [Classifier layer appended to ResNet](../code/resnet_classifier.py)
 
 - ### DenseNet: skip connections via concatenation
 
