@@ -24,7 +24,7 @@ This repository contains
 - [Chapter 6: Generative Adversarial Networks](./notes/Chapter_6.md)
 - [Chapter 7: Attention and Transformers](./notes/Chapter_7.md)
 - [Chapter 8: Graph Neural Networks](./notes/Chapter_8.md)
-- [Conclusion](./notes/Chapter_9.md)
+- [Conclusion](./notes/Conclusion.md)
 
 ## Assignments
 
@@ -40,6 +40,12 @@ This repository contains
   |#5|[Autoencoder](./notes/Chapter_5.md#exercise)|Filter size computed from the equation for number of parameters.|
   |#5|[ELBO](./notes/Chapter_5.md#elbo-implementation)|Evidence lower bound (ELBO)|
   |#5|[Reparameterization trick](./notes/Chapter_5.md#reparameterization-trick-exercise)|Reparameterization trick|
+  |#6|[GAN](./notes/Chapter_6.md#develop-a-gan-with-pytorch)|Generative Adversarial Network|
+  |#7|[Transformer Encoder](./notes/Chapter_7.md#build-a-transformer-encoder)|A simple transformer encoder|
+  |#8|[Graph Laplacian](./notes/Chapter_8.md#the-graph-laplacian)|Graph Laplacian|
+  |#8|[Spectral Image Segmentation](./notes/Chapter_8.md#spectral-image-segmentation-with-graph-laplacian)|Spectral Image Segmentation with Graph Laplacian|
+  |#8|[Chebyshev approximation](./notes/Chapter_8.md#illustration-of-the-general-graph-convolution-method)|Chebyshev approximation for the Laplacian powers|
+  |#8|[GCN](./notes/Chapter_8.md#assignment)|1-hop Graph Convolutional Network|
   *****
 
 ## Related Repositories
