@@ -48,9 +48,14 @@ This repository contains
   |#8|[GCN](./notes/Chapter_8.md#assignment)|1-hop Graph Convolutional Network|
   *****
 
+## Certificate
+
+- [Course completion certificate](./certificate/introduction_to_deep_learning_and_neural_networks_educative.pdf)
+- Issued on August 2023
+
 ## Related Repositories
 
-- [Deep Learning PyTorch Fundamentals](../Deep_Learning_Pytorch_Fundamentals_Educative/)
+- [Deep Learning PyTorch Fundamentals](https://github.com/kaushikacharya/course_programming_assignment/tree/master/Deep_Learning_Pytorch_Fundamentals_Educative)
   - Explains the basics of PyTorch model training using a simple regression and a classification problem.
   - The steps involved in the training process are better explained in this course.
 
