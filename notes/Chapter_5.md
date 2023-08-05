@@ -28,7 +28,7 @@
 - ### Generative models
 
   - Probability density function $p(x)$
-    - This probability density effectively describes the behavior of our training data and enables us to generate novel data by smapling from the distribution.
+    - This probability density effectively describes the behavior of our training data and enables us to generate novel data by sampling from the distribution.
 
 - ### Latent variable models
 
