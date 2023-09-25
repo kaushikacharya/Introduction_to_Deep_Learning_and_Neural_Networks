@@ -227,7 +227,7 @@
 
   - Build and train a simple neural network on classifying objects in 10 classes on CIFAR 10 dataset.
     - [Notebook (Question)](../code/train_question.ipynb)
-    - [Notebook (Answer)](../code/train_question.ipynb)
+    - [Notebook (Answer)](../code/train_answer.ipynb)
 
   - Additional info (KA):
     - Hint available at PyTorch's [optimization documentation page](https://pytorch.org/docs/stable/optim.html#taking-an-optimization-step).
