@@ -42,11 +42,13 @@
       - Balraj Ashwath mentions few examples of latent space:
         - Word embedding space
         - Image feature space
+          - CNNs in the final layers encode higher-level features in the input image
         - Topic modeling methods
           - Latent Dirichlet Allocation (LDA)
           - Probabilistic Latent Semantic Analysis (PLSA)
         - VAEs & GANs:
-          - Aim to obtain a latent space/distribution that closely approximates the real latent space/distbution of the observed data.
+          - Aim to obtain a latent space/distribution that closely approximates the real latent space/distribution of the observed data.
+          - [MIT's lecture on Deep Generative Models](https://www.youtube.com/watch?v=yFBFl1cLYx8&list=PLtBw6njQRU-rwp5__7C0oIVt26ZgjG9NI&index=5)
   - We can now define five basic terms:
     - **Prior distribution** $p(z)$
       - Models the behavior of the latent variables.
@@ -74,6 +76,8 @@
     - Marginal $p(x)$
     - Prior $p(z)$,
   - we can do the following:
+    - [Generation](#generation)
+    - [Inference](#inference)
 
 - ### Generation
 
@@ -101,6 +105,8 @@
 - Goal:
   - Learn how to reconstruct the input data.
 - Additional info (KA):
+  - [PyimageSearch article on Introduction to Autoencoders](https://pyimagesearch.com/2023/07/10/introduction-to-autoencoders/#h3What)
+    - Figure 2 describes the architecture of Autoencoder
   - [Variational Autoencoders: A Vanilla Implementation](https://mlarchive.com/deep-learning/variational-autoencoders-a-vanilla-implementation/)
     - Main goal:
       - To generate high quality output data (e.g. images, texts, or sounds) that belong to the same distribution of the input data.
@@ -188,12 +194,17 @@
   - The decoder receives the distribution parameters and tries to reconstruct the input x.
   - Challenge:
     - One cannot backpropagate through a sampling operation.
-  - Additional resource (KA):
+  - Additional resources (KA):
     - [Matthew Bernstein's blog on Variational autoencoders](https://mbernste.github.io/posts/vae/)
       - Author explains VAE and related concepts in detail with mathematical equations.
       - Two complimentary ways of viewing the VAE:
         - As a probabilistic model that is fit using variational Bayesian inference.
         - As a type of autoencoding neural network.
+    - [PyimageSearch article on Introduction to Autoencoders](https://pyimagesearch.com/2023/07/10/introduction-to-autoencoders/)
+      - Both encoder and decoder can be fully connected, convolutional or recurrent, depending on the input data's nature and the autoencoder's architecture.
+      - Various types of autoencoders are described.
+      - Applications of autoencoders explained.
+      - Difference with GANs explained.
 
 - ### Train a variational autoencoder
 
@@ -203,10 +214,11 @@
   - Goal:
     - Variational posterior as close as possible to the true posterior.
   - Evidence Lower Bound (ELBO):
-    - Additional info (KA):
+    - Additional resources (KA):
       - [Matthew Bernstein's blog on ELBO](https://mbernste.github.io/posts/elbo/)
         - Explains definition, context and derivation.
       - [Matthew Bernstein's blog on Variational Inference](https://mbernste.github.io/posts/variational_inference/)
+        - Explains mathematically how variational inference minimizes KL-divergence by maximizing a surrogate quantity ELBO.
       - [Faculty of Khan's introduction to Variational Calculus](https://www.youtube.com/watch?v=6HeQc7CSkZs)
         - Explained with two examples:
           - Minimum path between two points.
@@ -244,6 +256,7 @@
 
   - Intuition:
     - Because we cannot compute the gradient of an expectation, we want to rewrite the expectation so that the distribution is independent of the parameter $\theta$.
+      - [Matthew Bernstein's blog on reparameterization trick](https://mbernste.github.io/posts/reparameterization_vi/) mentions that the challenge with the computing gradient of expectation is the integral.
   - Formulating the abstract idea:
     - Transform a sample from a **fixed**, known distribution to a sample from $q_{\phi}(z)$.
     - If we consider the Gaussian distribution, we can express $z$ wrt. a fixed $\epsilon$, where $\epsilon$ follows the normal distribution $N(0,1)$.
