@@ -217,6 +217,7 @@
     - Additional resources (KA):
       - [Matthew Bernstein's blog on ELBO](https://mbernste.github.io/posts/elbo/)
         - Explains definition, context and derivation.
+        - ```log``` being a concave function, opposite of [Jensen's inequality](https://en.wikipedia.org/wiki/Jensen%27s_inequality) holds.
       - [Matthew Bernstein's blog on Variational Inference](https://mbernste.github.io/posts/variational_inference/)
         - Explains mathematically how variational inference minimizes KL-divergence by maximizing a surrogate quantity ELBO.
       - [Faculty of Khan's introduction to Variational Calculus](https://www.youtube.com/watch?v=6HeQc7CSkZs)
@@ -225,15 +226,17 @@
           - Minimum time taken to travel from one point to another where velocity is dependent on position.
     - Loss = Reconstruction term - KL Divergence
       - 1st term: Reconstruction term
+        - $E_{q_\phi(z|x)} [log\,p_\theta(x|z)]$
         - Controls how well the VAE reconstructs a data point $x$ from a sample $z$ of the variational posterior.
         - Known as **negative reconstruction error**.
         - If data points are binary (follow the Bernoulli distribution):
           - reconstruction term can be proved to:
             - $log\, p_\theta(x_i|z_i) = \sum_{j=1}^n[x_{ij}log\,p_{ij} + (1 - x_{ij})log(1-p_{ij})]$
       - 2nd term: KL Divergence:
+        - $KL(q_\phi(z|x) || p_\theta(z))$
         - Controls how close the variational posterior is to the prior.
         - If we assume Gaussian prior distribution:
-          - -(1/2)$\sum_{j=1}^J(1 + log(\sigma_j^2) -\mu_j^2 - \sigma_j^2)$
+          - Closed form of KL divergence is -(1/2)$\sum_{j=1}^J(1 + log(\sigma_j^2) -\mu_j^2 - \sigma_j^2)$
   
 - ### ELBO Implementation
 
@@ -287,63 +290,70 @@
 
 ## Variational Autoencoder: Practice
 
-- ### Overview
-    - [Variation Autoencoder](../code/vae.py) code
-        - Implemented using 2 linear layers for both the encoder and decoder.
+- ### Overview VAE Practice
 
-- ### Reparameterization trick
-    - In order to generate samples from the encoder and pass them to the decoder, we also need to utilize the reparameterization trick.
-    - Remember: We need to be able to run the backward pass during training.
-    - The two networks are trained jointly by maximizing the ELBO.
-        - VAE case:
-            - $L_{\theta,\phi}(x) = E_{q_\phi(z|x)}[log\,p_\theta(x|z)] - KL(q_\phi(z|x)||p_\theta(z))$ 
+  - [Variational Autoencoder](../code/vae.py) code
+    - Implemented using 2 linear layers for both the encoder and decoder.
+
+- ### Reparameterization trick (Practice)
+
+  - In order to generate samples from the encoder and pass them to the decoder, we also need to utilize the reparameterization trick.
+  - Remember: We need to be able to run the backward pass during training.
+  - The two networks are trained jointly by maximizing the ELBO.
+    - VAE case:
+      - $L_{\theta,\phi}(x) = E_{q_\phi(z|x)}[log\,p_\theta(x|z)] - KL(q_\phi(z|x)||p_\theta(z))$
 
 - ### Analysis of loss terms
-    - Reconstruction loss
-        - The weird expectation term
-        - This loss is just the binary cross-entropy between the latent variable and the input.
+
+  - Reconstruction loss
+    - The weird expectation term
+    - This loss is just the binary cross-entropy between the latent variable and the input.
 
 - ### Training loop code in PyTorch
 
+  - ```train``` function in [notebook](../code/vae.ipynb)
+
 - ### Code analysis
-    - During training:
-        - A data point is passed to the encoder, which outputs
-            - mean
-            - log-variance of the approximate posterior.
-        - Reparameterization trick applied.
-        - Pass the reparameterized samples to the decoder to output the likelihood.
-        - Compute the ELBO and backpropagate the gradients.
-    - Generation of a new data point:
-        - Sample a set of latent vectors from the normal prior distribution.
-        - Obtain the latent variables from the encoder.
-        - Decoder transforms the latent variable of the sample to a new data point.
+
+  - During training:
+    - A data point is passed to the encoder, which outputs
+      - mean
+      - log-variance of the approximate posterior.
+    - Reparameterization trick applied.
+    - Pass the reparameterized samples to the decoder to output the likelihood.
+    - Compute the ELBO and backpropagate the gradients.
+- Generation of a new data point:
+  - Sample a set of latent vectors from the normal prior distribution.
+  - Obtain the latent variables from the encoder.
+  - Decoder transforms the latent variable of the sample to a new data point.
 
 - ### Homework task
-    - Task:
-        - Define a Convolutional VAE.
-        - Load the CIFAR10 data.
-        - Train the VAE.
-    - Additional resources (KA):
-        - [CIFAR tutorial](https://github.com/pytorch/tutorials/blob/main/beginner_source/blitz/cifar10_tutorial.py)
-            - Shows usage of [torchvision.datasets.CIFAR10](https://pytorch.org/vision/main/generated/torchvision.datasets.CIFAR10.html) to extract/download dataset.
-                - Enables code execution locally.
-    - Learnings (KA):
-        - Incorrect usage of ```BCELoss``` can lead to negative loss:
-            - https://discuss.pytorch.org/t/bce-loss-giving-negative-values/62309/3
-            - [BCELoss](https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html) documentation says:
-                - *measures the Binary Cross Entropy between the target and the input probabilities*
-                - *Note that the targets $y$ should be numbers between 0 and 1*.
-            - Case: Usage of [Template code](../code/vae.py) provided in this lesson led to above situation as the transformed image pixel values were beyond the accepted range of ```target```. It had negative values (observed minimum: -1).
-        - Solution:
-            - [Matthew Bernstein's blog](https://mbernste.github.io/posts/vae/) suggests *mean squared error*:
-                - In the section *Viewing the VAE loss function as regularized reconstruction loss*, author shows that analytical form of $log\, p_\theta(x_i|z_i)$ contains the squared error of simple autoencoder.
-                - **Doubts**:
-                    - Why should $\sigma_{decoder}$ be ignored in the loss function?
-                    - Isn't [GaussianNLLLoss](https://pytorch.org/docs/stable/generated/torch.nn.GaussianNLLLoss.html#torch.nn.GaussianNLLLoss) a more suitable loss function than [MSELoss](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html)?
-                    - Or should we have a custom loss function as shown in [machinelearningmastery's](https://machinelearningmastery.com/loss-functions-in-pytorch-models/) section on *custom loss function*.
-                    - What should be the analytical form of the *expectation*?
-                        - The Educative course mentions that for binary data points the analytical form can be represented by [BCELoss](https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html).
+
+  - Task:
+    - Define a Convolutional VAE.
+    - Load the CIFAR10 data.
+    - Train the VAE.
+  - Additional resources (KA):
+    - [CIFAR tutorial](https://github.com/pytorch/tutorials/blob/main/beginner_source/blitz/cifar10_tutorial.py)
+      - Shows usage of [torchvision.datasets.CIFAR10](https://pytorch.org/vision/main/generated/torchvision.datasets.CIFAR10.html) to extract/download dataset.
+        - Enables code execution locally.
+  - Learnings (KA):
+    - Incorrect usage of ```BCELoss``` can lead to negative loss:
+      - [PyTotch discussion thread](https://discuss.pytorch.org/t/bce-loss-giving-negative-values/62309/3)
+      - [BCELoss](https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html) documentation says:
+        - *measures the Binary Cross Entropy between the target and the input probabilities*
+        - *Note that the targets $y$ should be numbers between 0 and 1*.
+      - Case: Usage of [Template code](../code/vae.py) provided in this lesson led to above situation as the transformed image pixel values were beyond the accepted range of ```target```. It had negative values (observed minimum: -1).
     - Solution:
-        - [Kaushik](../code/vae.ipynb)
-            - Observation:
-                - Reconstructed images are quite blurred.
+      - [Matthew Bernstein's blog](https://mbernste.github.io/posts/vae/) suggests *mean squared error*:
+        - In the section *Viewing the VAE loss function as regularized reconstruction loss*, author shows that analytical form of $log\, p_\theta(x_i|z_i)$ contains the squared error of standard autoencoder.
+        - **Doubts**:
+          - Why should $\sigma_{decoder}$ be ignored in the loss function?
+          - Isn't [GaussianNLLLoss](https://pytorch.org/docs/stable/generated/torch.nn.GaussianNLLLoss.html#torch.nn.GaussianNLLLoss) a more suitable loss function than [MSELoss](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html)?
+          - Or should we have a custom loss function as shown in [machinelearningmastery's](https://machinelearningmastery.com/loss-functions-in-pytorch-models/) section on *custom loss function*.
+          - What should be the analytical form of the *expectation*?
+            - The Educative course mentions that for binary data points the analytical form can be represented by [BCELoss](https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html).
+  - Solution:
+    - [Kaushik](../code/vae.ipynb)
+      - Observation:
+        - Reconstructed images are quite blurred.
