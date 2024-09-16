@@ -9,6 +9,8 @@
 
 - ### Adversarial attacks
 
+  - Vulnerability of deep learning models
+    - These models are highly vulnerable to attacks that are based on small modifications of the input at test time.
   - Construction of adversarial example:
     - Visually indistinguishable image
     - But classified incorrectly by the trained classifier model.
@@ -36,6 +38,8 @@
         # Return the perturbed image
         return perturbed_image
     ```
+
+  - This perturbation is added to the initial image.
 
 - ### From adversarial attacks to generative learning
 
