@@ -42,7 +42,7 @@
       - Balraj Ashwath mentions few examples of latent space:
         - Word embedding space
         - Image feature space
-          - CNNs in the final layers encode higher-level features in the input image
+          - CNNs in the final layers encode higher-level features of the input image
         - Topic modeling methods
           - Latent Dirichlet Allocation (LDA)
           - Probabilistic Latent Semantic Analysis (PLSA)
@@ -274,6 +274,9 @@
       - $z = \mu + \sigma\epsilon$ with $\epsilon$ ~ $N(0,1)$
     - $\epsilon$ term introduces the stochastic part and is **not** involved in the training process.
     - Therefore, we can now compute the gradient and run backpropagation of ELBO w.r.t. variational parameters $\theta$.
+  - Additional resources (KA)
+    - [Gregory Gundersen's blog](https://gregorygundersen.com/blog/2018/04/29/reparameterization/) on the need for reparameterization trick
+      - Referred in [Stackoverflow thread](https://stats.stackexchange.com/questions/409995/why-is-random-sampling-a-non-differentiable-operation)
   
 - ### Reparameterization Trick Exercise
 
