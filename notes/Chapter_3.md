@@ -203,12 +203,12 @@
       - $\Delta w_i = - \lambda \frac{\partial C}{\partial \Delta w_i}$
       - IMHO, the derivative is w.r.t. $w_i$, not $\Delta w_i$
 
-- ### Skip connectione for the win
+- ### Skip connections for the win
 
   - Skip connections skip some layer in the neural network and feed the output of one layer as the input to the next layers, instead of just the next one.
   - Two fundamental ways to skip connections through different non-sequential layers:
-    - **Addition**, as in residual architectures.
-    - **Concatenation**, as in densely connected architectures.
+    - **Addition**, as in [residual architectures](#resnet-skip-connections-via-addition).
+    - **Concatenation**, as in [densely connected architectures](#densenet-skip-connections-via-concatenation).
 
 - ### ResNet: skip connections via addition
 
@@ -228,7 +228,7 @@
   - Learned features in earlier layers correspond to **lower semantic information** that is extracted from the input.
     - Without the skip connection, that information would have turned too abstract.
   - Coding exercise:
-    - Implement a skip connection in PyTorch:
+    - Implement a skip connection in PyTorch.
     - [My solution](../code/skip_connection.py)
   - Exercise for Final Quiz:
     - [Classifier layer appended to ResNet](../code/resnet_classifier.py)
@@ -246,7 +246,7 @@
       - Substantially reduce the number of parameters.
     - Dividing the network into densely connected blocks:
       - Inside the dense blocks, the feature map size remains the same.
-        - This makes the feature concatenation possible.
+        - This makes the feature concatenation computationally feasible.
     - Transition layers:
       - Layers between the dense blocks.
       - It performs convolution + pooling.
@@ -266,7 +266,7 @@
     - The paper showed evidence that simply adding more layers increases performance.
   - Principles:
     - A stack of three $3*3$ convoluiton layers are similar/even better to a single $7*7$ layer.
-      - Reason: Usage of three non-linear activations in between (instead of one) makes the function more discriminative.
+      - Reason: Usage of three non-linear activations in-between (instead of one) makes the function more discriminative.
     - This design decreases the number of parameters.
 
 - ### InceptionNet/GoogleNet
